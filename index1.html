@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timer and Spotify Embed</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+
+        .min-h-screen {
+            min-height: 100vh;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .justify-center {
+            justify-content: center;
+        }
+
+        .bg-cover {
+            background-size: cover;
+        }
+
+        .bg-center {
+            background-position: center;
+        }
+
+        .absolute {
+            position: absolute;
+        }
+
+        .inset-0 {
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+
+        .bg-black\/40 {
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .timer {
+            text-align: center;
+            font-size: 3rem;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="min-h-screen flex items-center justify-center bg-cover bg-center">
+        <div class="absolute inset-0 bg-black/40"></div>
+        <div id="world-clock"></div>
+        <div id="timer" class="timer">00:00</div>
+        <div id="spotify-container"></div>
+    </div>
+    <script>
+        // Timer functionality
+        let timerDisplay = document.getElementById('timer');
+        let timerInterval;
+        let seconds = 0;
+        let isRunning = false;
+
+        function startTimer() {
+            if (!isRunning) {
+                isRunning = true;
+                timerInterval = setInterval(() => {
+                    seconds++;
+                    let mins = Math.floor(seconds / 60);
+                    let secs = seconds % 60;
+                    timerDisplay.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                }, 1000);
+            }
+        }
+
+        function stopTimer() {
+            if (isRunning) {
+                clearInterval(timerInterval);
+                isRunning = false;
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            seconds = 0;
+            timerDisplay.textContent = '00:00';
+        }
+
+        // World Clock functionality
+        function updateWorldClock() {
+            const worldClock = document.getElementById('world-clock');
+            const now = new Date();
+            worldClock.textContent = now.toLocaleTimeString();
+        }
+
+        setInterval(updateWorldClock, 1000);
+
+        // Spotify Embed functionality
+        const spotifyUrl = 'https://open.spotify.com/playlist/4d3PqXgP9C9GhdmHsuztXx?si=08f24b25b3874e71';
+        const oEmbedUri = `https://open.spotify.com/oembed?url=${encodeURIComponent(spotifyUrl)}`;
+
+        fetch(oEmbedUri)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('spotify-container').innerHTML = data.html;
+            })
+            .catch(error => console.error('Error fetching oEmbed data:', error));
+
+        // Dark mode functionality
+        const darkMode = false; // Set this based on your requirement
+
+        if (darkMode) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+
+        // Start the timer on page load for demonstration
+        startTimer();
+    </script>
+</body>
+</html>
